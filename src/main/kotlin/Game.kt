@@ -8,13 +8,15 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.ObjectMap
+import com.fasterxml.jackson.databind.ObjectMapper
 import functions.*
 import map.createMap
+import models.Settings
 import org.lwjgl.opengl.AMDSamplePositions
 import org.lwjgl.opengl.GL20
 import java.io.File
 import javax.imageio.ImageIO
-
+lateinit var settings: Settings
 class Game: Game() {
     private lateinit var world: World
     private lateinit var camera: OrthographicCamera
@@ -28,11 +30,24 @@ class Game: Game() {
 
     private val blocks: ArrayList<Body> = ArrayList()
     private var bullets: ArrayList<Body> = ArrayList()
+    private val objectMapper = ObjectMapper()
+
 
     private lateinit var forceController: ForceController
     private lateinit var spriteBatch: SpriteBatch
 
     override fun create() {
+        try {
+            if (objectMapper.readValue(File("settings.json"), Settings::class.java).create){
+                settings = objectMapper.readValue(File("settings.json"), Settings::class.java)
+                println("Create is true")
+            }
+            else{objectMapper.writerWithDefaultPrettyPrinter().writeValue(File("settings.json"), Settings()) }
+        } catch (e: Throwable){
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(File("settings.json"), Settings())
+            settings = objectMapper.readValue(File("settings.json"), Settings::class.java)
+        }
+
         Gdx.gl.glClearColor(0.18f, 0.18f, 0.18f, 1f)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
@@ -56,7 +71,7 @@ class Game: Game() {
         musicList.put(Music.GOD, Gdx.audio.newSound(Gdx.files.internal("music/sus.mp3")))
 
         loadMap("map.png")
-        musicList[Music.GOD].play(0.6f)
+        musicList[Music.GOD].play(0.4f)
         forceController = ForceController(player, blocks, bullets, world)
         Gdx.input.inputProcessor = forceController
 
@@ -69,10 +84,10 @@ class Game: Game() {
 
         createMap(ImageIO.read(File(path)), 5F, 5F).forEach {
             when(it.color) {
-                Textures.PLAYER -> player = Entity(p, world.createCirclePlayer(it.x, it.y, 2f))
+                Textures.PLAYER -> player = Entity(p, world.createCirclePlayer(it.x, it.y, settings.player))
                 Textures.BODY_WALL -> bodyWalls.add(Entity(bw, world.createWall(it.x, it.y, 2.5f, 2.5f)))
                 Textures.CLEAR_WALL -> clearWalls.add(Vector2(it.x, it.y))
-                Textures.ENEMY -> enemies.add(Entity(en, world.createCircleEnemy(it.x, it.y, 1.5f), speed = 60f))
+                Textures.ENEMY -> enemies.add(Entity(en, world.createCircleEnemy(it.x, it.y, settings.enemy), speed = settings.enemySpeed))
             }
             when(it.color) {
                 Textures.PLAYER -> clearWalls.add(Vector2(it.x, it.y))
@@ -108,20 +123,20 @@ class Game: Game() {
         block.forEach { blocks.add(it) }
     }
     fun addBullet(bullet: ArrayList<Body>, position: Vector2, wor: World, direction: Vector2){
-        val body = wor.createCircleBullet(position.x, position.y, 0.5f)
-        body.applyForceToCenter(direction, false)
-        bullet.add(body)
-        bullet.forEach {
-            bullets.add(it)
+            val body = wor.createCircleBullet(position.x, position.y, 0.5f)
+            body.applyForceToCenter(direction, false)
+            bullet.add(body)
+            bullet.forEach {
+                bullets.add(it)
         }
     }
     override fun resize(width: Int, height: Int) {
-        val size = 12.5f
-        val camWidth: Float = size * size
-        val camHeight = camWidth * (height.toFloat() / width.toFloat())
-        camera.viewportWidth = camWidth
-        camera.viewportHeight = camHeight
-        camera.update()
+            val size = settings.screen
+            val camWidth: Float = size * size
+            val camHeight = camWidth * (height.toFloat() / width.toFloat())
+            camera.viewportWidth = camWidth
+            camera.viewportHeight = camHeight
+            camera.update()
     }
     override fun dispose() {
         world.dispose()

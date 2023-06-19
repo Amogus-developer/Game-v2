@@ -14,9 +14,14 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.14.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.14.2")
+
     implementation("com.badlogicgames.gdx:gdx:1.11.0")
     implementation("com.badlogicgames.gdx:gdx-box2d:1.11.0")
     implementation("com.badlogicgames.gdx:gdx-freetype:1.11.0")
+
 
     implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.11.0")
     implementation("com.badlogicgames.gdx:gdx-platform:1.11.0:natives-desktop")

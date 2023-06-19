@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.World
 import functions.createWall
+import kotlin.math.cos
 
 class Entity(private val texture: Texture,
              private val body: Body,
@@ -19,15 +20,15 @@ class Entity(private val texture: Texture,
         spriteBatch.draw(texture, x-xy, y-xy, wh, wh)
     }
     fun renderPlayer(spriteBatch: SpriteBatch){
-        val wh = 4f
-        val xy = 1f
+        val wh = settings.player*2f
+        val xy = (settings.player*settings.player)/wh+(settings.player/2-1)
         val x = body.position.x
         val y = body.position.y
         spriteBatch.draw(texture, x-xy, y-xy, wh, wh)
     }
     fun renderEnemy(spriteBatch: SpriteBatch){
-        val wh = 3f
-        val xy = 0.5f
+        val wh = settings.enemy*2
+        val xy = (settings.enemy*settings.enemy)/wh+(settings.enemy/2-1)
         val x = body.position.x
         val y = body.position.y
         spriteBatch.draw(texture, x-xy, y-xy, wh, wh)

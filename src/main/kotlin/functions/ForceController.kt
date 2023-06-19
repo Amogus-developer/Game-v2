@@ -8,12 +8,13 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.World
+import settings
 
 class ForceController(private val player: Entity,
                       private val blocks: ArrayList<Body>,
                       private val bullets: ArrayList<Body>,
                       private val world: World,
-                      private val force: Float = 95f,
+                      private val force: Float = settings.playerSpeed,
                       private val speed: Float = 50000f): InputAdapter() {
 
     private val bodyForce = Vector2()

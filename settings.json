@@ -1,0 +1,9 @@
+{
+  "create" : true,
+  "god" : false,
+  "screen" : 12.5,
+  "player" : 2.0,
+  "enemy" : 1.5,
+  "playerSpeed" : 95.0,
+  "enemySpeed" : 60.0
+}
